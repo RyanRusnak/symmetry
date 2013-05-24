@@ -43,7 +43,7 @@
 				data:{user:{email:email, warp_one:JSON.stringify(firstWarp), 
 					warp_two:JSON.stringify(secondWarp)}},
 				headers: {
-					"Authorization": "Token token=<YOUR TOKEN>"
+					"Authorization": "Token token=<TOUR TOKEN>"
 				},
 				success:function(data){
 			    	console.log(data);
@@ -83,6 +83,10 @@
 	    canvas.addEventListener('mousedown', ev_canvas, false);
 	    canvas.addEventListener('mousemove', ev_canvas, false);
 	    canvas.addEventListener('mouseup',   ev_canvas, false);
+		// Attach the touchstart, touchmove and touchend event listeners.
+		canvas.addEventListener('touchstart', ev_canvas, false);
+		canvas.addEventListener('touchmove', ev_canvas, false);
+		canvas.addEventListener('touchend',   ev_canvas, false);
 	  }
 
 		//=====================================Drawing======================================//
@@ -92,19 +96,21 @@
 	    var tool = this;
 	    this.started = false;
 
-	    // This is called when you start holding down the mouse button.
-	    // This starts the pencil drawing.
-	    this.mousedown = function (ev) {
+	    // This is called when you start holding down the mouse button or touching the 
+		// screen. This starts the pencil drawing.
+	    this.start_pencil = function (ev) {
 	        context.beginPath();
 	        context.moveTo(ev._x, ev._y);
 	        tool.started = true;
 	    };
-
-	    // This function is called every time you move the mouse. Obviously, it only 
-	    // draws if the tool.started state is set to true (when you are holding down 
-	    // the mouse button).
+		this.mousedown = this.start_pencil;
+		this.touchstart = this.start_pencil;
+	    
+		// This function is called every time you move the mouse or move your finger
+		// on the screen. Obviously, it only draws if the tool.started state is set 
+		// to true (when you are holding down the mouse button or touching the screen).
 		// var counter = 0;
-	    this.mousemove = function (ev) {
+	    this.move_pencil = function (ev) {
 
 	      if (tool.started) {
 	        context.lineTo(ev._x, ev._y);
@@ -118,14 +124,18 @@
 	        context.stroke();
 	      }
 	    };
+		this.mousemove = this.move_pencil;
+		this.touchmove = this.move_pencil;
 
-	    // This is called when you release the mouse button.
-	    this.mouseup = function (ev) {
+	    // This is called when you release the mouse button or stop touching the screen.
+	    this.stop_pencil = function (ev) {
 	      if (tool.started) {
-	        tool.mousemove(ev);
+	        tool.move_pencil(ev);
 	        tool.started = false;
 	      }
 	    };
+		this.mouseup = this.stop_pencil;
+		this.touchend = this.stop_pencil;
 	  }
 
 	  // The general-purpose event handler. This function just determines the mouse 
